@@ -24,16 +24,16 @@ func main() {
 	taskQueue := make(chan string, 1000)
 	go startWorker(taskQueue)
 	readDir(".", taskQueue)
-	// countResult.RLock()
-	// for k, v := range countResult.m {
-	// 	fmt.Printf("%v:%v\n", k, v)
-	// }
-	// countResult.RUnlock()
 	wg.Wait()
 	countMap.Range(func(k, v interface{}) bool {
 		fmt.Printf("%v:%v\n", k, v)
 		return true
 	})
+	// countResult.RLock()
+	// for k, v := range countResult.m {
+	// 	fmt.Printf("%v:%v\n", k, v)
+	// }
+	// countResult.RUnlock()
 }
 
 func readDir(dir string, taskQueue chan<- string) {
@@ -57,12 +57,12 @@ func startWorker(taskQueue <-chan string) {
 	for {
 		select {
 		case filePath := <-taskQueue:
-			go wordCount(filePath)
+			go lineCount(filePath)
 		}
 	}
 }
 
-func wordCount(filePath string) {
+func lineCount(filePath string) {
 	defer wg.Done()
 	file, err := os.Open(filePath)
 	if err != nil {
