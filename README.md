@@ -3,7 +3,7 @@ Go Count Lines
 
 # Usage
 ```
-➜  gcl git:(master) ./gcl -help
+➜ ./gcl -help
 usage: gcl [flags] [dir]
 flags:
   -filetype string
@@ -18,5 +18,5 @@ flags:
 
 # Example
 ```
-./gcl -filetype=".js|.php" -top=10 /your/dir/path
+➜ ./gcl -filetype=".js|.php" -top=10 /your/dir1 /your/dir2
 ```
