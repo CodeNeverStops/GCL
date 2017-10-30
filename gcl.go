@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -17,13 +18,35 @@ import (
 // 	m map[string]int
 // }{m: make(map[string]int)}
 
+var Version = "0.0.1"
+
 var countMap = sync.Map{}
 var wg = sync.WaitGroup{}
 
+var (
+	help        = flag.Bool("help", false, "show usage help and quit")
+	showVersion = flag.Bool("version", false, "show version and quit")
+	fileType    = flag.String("filetype", "", "Specify the file type to count line")
+)
+
 func main() {
-	taskQueue := make(chan string, 1000)
+	flag.Usage = usage
+	flag.Parse()
+	if *help {
+		usage()
+		return
+	}
+	if *showVersion {
+		fmt.Println(Version)
+		return
+	}
+	args := flag.Args()
+
+	taskQueue := make(chan string, 10000)
 	go startWorker(taskQueue)
-	readDir(".", taskQueue)
+	for _, dir := range args {
+		readDir(dir, taskQueue, *fileType)
+	}
 	wg.Wait()
 	countMap.Range(func(k, v interface{}) bool {
 		fmt.Printf("%v:%v\n", k, v)
@@ -36,7 +59,13 @@ func main() {
 	// countResult.RUnlock()
 }
 
-func readDir(dir string, taskQueue chan<- string) {
+func usage() {
+	fmt.Println("usage: gcl [flags] [dir]")
+	fmt.Println("flags:")
+	flag.PrintDefaults()
+}
+
+func readDir(dir string, taskQueue chan<- string, fileType string) {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
@@ -45,8 +74,11 @@ func readDir(dir string, taskQueue chan<- string) {
 	for _, file := range files {
 		filePath := filepath.Join(dir, file.Name())
 		if file.IsDir() {
-			readDir(filePath, taskQueue)
+			readDir(filePath, taskQueue, fileType)
 		} else {
+			if len(fileType) > 0 && filepath.Ext(filePath) != fileType {
+				continue
+			}
 			wg.Add(1)
 			taskQueue <- filePath
 		}
