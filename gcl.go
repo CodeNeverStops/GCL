@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 )
@@ -28,6 +29,7 @@ var (
 	help        = flag.Bool("help", false, "show usage help and quit")
 	showVersion = flag.Bool("version", false, "show version and quit")
 	fileType    = flag.String("filetype", "", "Specify the file type to count line")
+	topNum      = flag.Int("top", 0, "list top N files")
 )
 
 func main() {
@@ -60,10 +62,29 @@ func main() {
 
 	wg.Wait()
 
+	total := 0
+	type kv struct {
+		Key   string
+		Value int
+	}
+	var countResult []kv
 	countMap.Range(func(k, v interface{}) bool {
-		fmt.Printf("%v:%v\n", k, v)
+		total += v.(int)
+		countResult = append(countResult, kv{k.(string), v.(int)})
+		// fmt.Printf("%v:%v\n", k, v)
 		return true
 	})
+	fmt.Printf("%s: %d\n", "total", total)
+	sort.Slice(countResult, func(i, j int) bool {
+		return countResult[i].Value > countResult[j].Value
+	})
+	for i, kv := range countResult {
+		if i >= *topNum {
+			break
+		}
+		fmt.Printf("%s: %d[%d%%]\n", kv.Key, kv.Value, kv.Value*100/total)
+	}
+
 	// countResult.RLock()
 	// for k, v := range countResult.m {
 	// 	fmt.Printf("%v:%v\n", k, v)
