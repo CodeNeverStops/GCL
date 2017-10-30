@@ -41,7 +41,7 @@ func main() {
 		fmt.Println(Version)
 		return
 	}
-	args := flag.Args()
+	dirList := flag.Args()
 
 	taskQueue := make(chan string, 10000)
 	go startWorker(taskQueue)
@@ -51,7 +51,10 @@ func main() {
 		fileTypeList = strings.Split(*fileType, "|")
 	}
 
-	for _, dir := range args {
+	if len(dirList) == 0 {
+		dirList = []string{"."}
+	}
+	for _, dir := range dirList {
 		readDir(dir, taskQueue, fileTypeList)
 	}
 
