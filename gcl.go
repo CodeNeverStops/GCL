@@ -75,6 +75,9 @@ func main() {
 		return true
 	})
 	fmt.Printf("%s: %d\n", "total", total)
+	if *topNum == 0 {
+		return
+	}
 	sort.Slice(countResult, func(i, j int) bool {
 		return countResult[i].Value > countResult[j].Value
 	})
@@ -160,6 +163,11 @@ func lineCount(filePath string) {
 		}
 		buffer.Write(part)
 		if !prefix {
+			lineStr := fmt.Sprintf("%s", part)
+			lineStr = strings.Trim(lineStr, " ")
+			if len(lineStr) == 0 {
+				continue
+			}
 			lines++
 			buffer.Reset()
 		}
