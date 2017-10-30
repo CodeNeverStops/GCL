@@ -20,3 +20,6 @@ flags:
 ```
 ➜ ./gcl -filetype=".js|.php" -top=10 /your/dir1 /your/dir2
 ```
+
+# TODO List
+- [ ] Add exclude dirs flag
