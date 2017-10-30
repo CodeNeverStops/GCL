@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -44,10 +45,18 @@ func main() {
 
 	taskQueue := make(chan string, 10000)
 	go startWorker(taskQueue)
-	for _, dir := range args {
-		readDir(dir, taskQueue, *fileType)
+
+	var fileTypeList []string
+	if len(*fileType) > 0 {
+		fileTypeList = strings.Split(*fileType, "|")
 	}
+
+	for _, dir := range args {
+		readDir(dir, taskQueue, fileTypeList)
+	}
+
 	wg.Wait()
+
 	countMap.Range(func(k, v interface{}) bool {
 		fmt.Printf("%v:%v\n", k, v)
 		return true
@@ -65,7 +74,7 @@ func usage() {
 	flag.PrintDefaults()
 }
 
-func readDir(dir string, taskQueue chan<- string, fileType string) {
+func readDir(dir string, taskQueue chan<- string, fileTypeList []string) {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
@@ -74,9 +83,18 @@ func readDir(dir string, taskQueue chan<- string, fileType string) {
 	for _, file := range files {
 		filePath := filepath.Join(dir, file.Name())
 		if file.IsDir() {
-			readDir(filePath, taskQueue, fileType)
+			readDir(filePath, taskQueue, fileTypeList)
 		} else {
-			if len(fileType) > 0 && filepath.Ext(filePath) != fileType {
+			typeIsMatch := false
+			if len(fileTypeList) > 0 {
+				for _, fileType := range fileTypeList {
+					if filepath.Ext(filePath) == fileType {
+						typeIsMatch = true
+						break
+					}
+				}
+			}
+			if !typeIsMatch {
 				continue
 			}
 			wg.Add(1)
