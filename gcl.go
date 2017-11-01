@@ -92,7 +92,7 @@ func main() {
 		if i >= *topNum {
 			break
 		}
-		fmt.Printf("%s: %d[%d%%]\n", kv.Key, kv.Value, kv.Value*100/total)
+		fmt.Printf("%s: %d[%.2f%%]\n", kv.Key, kv.Value, float64(kv.Value)*100/float64(total))
 	}
 
 	// countResult.RLock()
