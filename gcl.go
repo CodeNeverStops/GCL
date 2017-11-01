@@ -30,6 +30,7 @@ var (
 	showVersion = flag.Bool("version", false, "show version and quit")
 	fileType    = flag.String("filetype", "", "Specify the file type to count line")
 	topNum      = flag.Int("top", 0, "list top N files")
+	sortAsc     = flag.Bool("sortasc", false, "sort files by line count asc")
 )
 
 func main() {
@@ -78,9 +79,16 @@ func main() {
 	if *topNum == 0 {
 		return
 	}
-	sort.Slice(countResult, func(i, j int) bool {
-		return countResult[i].Value > countResult[j].Value
-	})
+	if *sortAsc {
+		sort.Slice(countResult, func(i, j int) bool {
+			return countResult[i].Value < countResult[j].Value
+		})
+	} else {
+		sort.Slice(countResult, func(i, j int) bool {
+			return countResult[i].Value > countResult[j].Value
+		})
+	}
+	fmt.Println("count result")
 	for i, kv := range countResult {
 		if i >= *topNum {
 			break
@@ -120,6 +128,8 @@ func readDir(dir string, taskQueue chan<- string, fileTypeList []string) {
 						break
 					}
 				}
+			} else {
+				typeIsMatch = true
 			}
 			if !typeIsMatch {
 				continue
