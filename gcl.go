@@ -88,7 +88,6 @@ func main() {
 			return countResult[i].Value > countResult[j].Value
 		})
 	}
-	fmt.Println("count result")
 	for i, kv := range countResult {
 		if i >= *topNum {
 			break
