@@ -30,7 +30,7 @@ var (
 	showVersion = flag.Bool("version", false, "show version and quit")
 	fileType    = flag.String("filetype", "", "specify the file type to count line")
 	topNum      = flag.Int("top", 0, "list top N files")
-	sortAsc     = flag.Bool("sortasc", false, "sort files by line count asc")
+	sortAsc     = flag.Bool("sortasc", false, "sort files in ascending order")
 )
 
 func main() {
