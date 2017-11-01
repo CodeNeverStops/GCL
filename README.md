@@ -3,13 +3,15 @@ Go Count Lines
 
 # Usage
 ```
-➜ ./gcl -help
+➜  gcl git:(master) ./gcl -help
 usage: gcl [flags] [dir]
 flags:
   -filetype string
-        Specify the file type to count line
+        specify the file type to count line
   -help
         show usage help and quit
+  -sortasc
+        sort files by line count asc
   -top int
         list top N files
   -version

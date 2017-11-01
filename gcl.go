@@ -28,7 +28,7 @@ var wg = sync.WaitGroup{}
 var (
 	help        = flag.Bool("help", false, "show usage help and quit")
 	showVersion = flag.Bool("version", false, "show version and quit")
-	fileType    = flag.String("filetype", "", "Specify the file type to count line")
+	fileType    = flag.String("filetype", "", "specify the file type to count line")
 	topNum      = flag.Int("top", 0, "list top N files")
 	sortAsc     = flag.Bool("sortasc", false, "sort files by line count asc")
 )
