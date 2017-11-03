@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/user"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -20,10 +21,13 @@ import (
 // 	m map[string]int
 // }{m: make(map[string]int)}
 
-var Version = "0.0.1"
-
-var countMap = sync.Map{}
-var wg = sync.WaitGroup{}
+var (
+	Version        = "0.0.1"
+	countMap       = sync.Map{}
+	wg             = sync.WaitGroup{}
+	fileTypeList   []string
+	excludeDirList []string
+)
 
 var (
 	help        = flag.Bool("help", false, "show usage help and quit")
@@ -31,6 +35,7 @@ var (
 	fileType    = flag.String("filetype", "", "specify the file type to count line")
 	topNum      = flag.Int("top", 0, "list top N files")
 	sortAsc     = flag.Bool("sortasc", false, "sort files in ascending order")
+	excludeDir  = flag.String("excludedir", "", "specify the exclude dirs")
 )
 
 func main() {
@@ -49,16 +54,28 @@ func main() {
 	taskQueue := make(chan string, 10000)
 	go startWorker(taskQueue)
 
-	var fileTypeList []string
 	if len(*fileType) > 0 {
 		fileTypeList = strings.Split(*fileType, "|")
 	}
+
+	if len(*excludeDir) > 0 {
+		excludeDirList = strings.Split(*excludeDir, "|")
+		for i, exDir := range excludeDirList {
+			if strings.HasPrefix(exDir, "~") {
+				currUser, err := user.Current()
+				if err == nil {
+					excludeDirList[i] = currUser.HomeDir + exDir[1:]
+				}
+			}
+		}
+	}
+	fmt.Println(excludeDirList)
 
 	if len(dirList) == 0 {
 		dirList = []string{"."}
 	}
 	for _, dir := range dirList {
-		readDir(dir, taskQueue, fileTypeList)
+		readDir(dir, taskQueue)
 	}
 
 	wg.Wait()
@@ -108,7 +125,14 @@ func usage() {
 	flag.PrintDefaults()
 }
 
-func readDir(dir string, taskQueue chan<- string, fileTypeList []string) {
+func readDir(dir string, taskQueue chan<- string) {
+	if len(excludeDirList) > 0 {
+		for _, exDir := range excludeDirList {
+			if exDir == dir {
+				return
+			}
+		}
+	}
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		log.Fatal(err)
@@ -117,7 +141,7 @@ func readDir(dir string, taskQueue chan<- string, fileTypeList []string) {
 	for _, file := range files {
 		filePath := filepath.Join(dir, file.Name())
 		if file.IsDir() {
-			readDir(filePath, taskQueue, fileTypeList)
+			readDir(filePath, taskQueue)
 		} else {
 			typeIsMatch := false
 			if len(fileTypeList) > 0 {

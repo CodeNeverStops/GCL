@@ -6,6 +6,8 @@ Go Count Lines
 ➜  gcl git:(master) ./gcl -help
 usage: gcl [flags] [dir]
 flags:
+  -excludedir string
+        specify the exclude dirs
   -filetype string
         specify the file type to count line
   -help
@@ -22,6 +24,3 @@ flags:
 ```
 ➜ ./gcl -filetype=".js|.php" -top=10 /your/dir1 /your/dir2
 ```
-
-# TODO List
-- [ ] Add exclude dirs flag
