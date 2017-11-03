@@ -11,7 +11,7 @@ flags:
   -help
         show usage help and quit
   -sortasc
-        sort files by line count asc
+        sort files in ascending order
   -top int
         list top N files
   -version
