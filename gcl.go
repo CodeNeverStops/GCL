@@ -69,7 +69,6 @@ func main() {
 			}
 		}
 	}
-	fmt.Println(excludeDirList)
 
 	if len(dirList) == 0 {
 		dirList = []string{"."}
