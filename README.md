@@ -3,7 +3,7 @@ Go Count Lines
 
 # Usage
 ```
-➜  gcl git:(master) ./gcl -help
+➜ ./gcl -help
 usage: gcl [flags] [dir]
 flags:
   -excludedir string
