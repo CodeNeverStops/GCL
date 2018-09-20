@@ -22,5 +22,7 @@ flags:
 
 # Example
 ```
-➜ ./gcl -filetype=".js|.php" -top=10 /your/dir1 /your/dir2
+➜ ./gcl -filetype ".js|.php" -top 10 /your/dir1 /your/dir2
+or
+➜ ./gcl -filetype ".go" -excludedir "vendor" -top 10 ./
 ```
